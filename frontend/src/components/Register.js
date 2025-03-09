@@ -1,26 +1,25 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
-const Login = () => {
+const Register = () => {
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+    const [ setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('https://localhost:7055/gateway/auth/login', {
+            const response = await axios.post('https://localhost:7055/gateway/auth/register', {
                 username,
+                email,
                 password,
             });
-
-            // Сохраните токен в localStorage 
-            localStorage.setItem('token', response.data.token);
-            console.log('Login successful:', response.data);
+            console.log('Registration successful:', response.data);
         } catch (error) {
-            setError('Invalid username or password');
-            console.error('Login failed:', error);
+            setError('Registration failed');
+            console.error('Registration failed:', error);
         }
     };
 
@@ -35,7 +34,7 @@ const Login = () => {
                 }}
             >
                 <Typography component="h1" variant="h5">
-                    Login
+                    Register
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
                     <TextField
@@ -46,6 +45,15 @@ const Login = () => {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        label="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <TextField
                         margin="normal"
@@ -62,7 +70,7 @@ const Login = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        LoginS
+                        Register
                     </Button>
                 </Box>
             </Box>
@@ -70,4 +78,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;
