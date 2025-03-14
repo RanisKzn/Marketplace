@@ -39,7 +39,7 @@ namespace ProductService.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Post(Product newProduct)
+        public async Task<IActionResult> Post([FromBody]Product newProduct)
         {
             await _productService.CreateAsync(newProduct);
             return CreatedAtAction(nameof(Get), new { id = newProduct.Id }, newProduct);
