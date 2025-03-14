@@ -62,7 +62,7 @@ const Login = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        LoginS
+                        Login
                     </Button>
                 </Box>
             </Box>
