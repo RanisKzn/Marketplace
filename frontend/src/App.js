@@ -12,8 +12,6 @@ function App() {
 
     const tabs = [
         { name: "Products", path: "/products", component: <ProductList /> },
-        { name: "Login", path: "/login", component: <Login /> },
-        { name: "Register", path: "/register", component: <Register /> },
     ];
 
     const handleTabChange = (event, newValue) => {

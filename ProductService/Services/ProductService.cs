@@ -33,5 +33,15 @@ namespace ProductService.Services
 
         public async Task RemoveAsync(string id) =>
             await _products.DeleteOneAsync(x => x.Id == id);
+
+        public async Task<List<Product>> GetPaginatedAsync(int skip, int limit) =>
+            await _products
+            .Find(_ => true)
+            .Skip(skip)
+            .Limit(limit)
+            .ToListAsync();
+
+        public async Task<long> GetTotalCountAsync() =>
+            await _products.CountDocumentsAsync(_ => true);
     }
 }

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,6 +20,7 @@ const Login = () => {
             // Сохраните токен в localStorage 
             localStorage.setItem('token', response.data.token);
             console.log('Login successful:', response.data);
+            navigate('/product');
         } catch (error) {
             setError('Invalid username or password');
             console.error('Login failed:', error);
@@ -60,7 +63,15 @@ const Login = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{
+                            mt: 3,
+                            mb: 2,
+                            backgroundColor: 'darkviolet',
+                            '&:hover': {
+                                backgroundColor: 'purple',
+                            },
+                            color: 'white'
+                        }}
                     >
                         Login
                     </Button>

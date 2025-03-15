@@ -11,5 +11,7 @@ namespace ProductService.Services
         Task UpdateAsync(string id, Product updatedProduct);
         Task RemoveAsync(string id);
         IMongoCollection<Product> GetProductCollection();
+        Task<List<Product>> GetPaginatedAsync(int skip, int limit);
+        Task<long> GetTotalCountAsync();
     }
 }

@@ -1,67 +1,83 @@
 ﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {
-    Container,
-    Typography,
-    Grid,
-    Card,
-    CardContent,
-    CardMedia,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField
-} from '@mui/material';
+import { Container, Typography, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Pagination, CircularProgress } from '@mui/material';
+import ProductCard from './ProductCard';
+
 const ProductList = () => {
     const [products, setProducts] = useState([]);
-    const [open, setOpen] = useState(false);
-    const [newProduct, setNewProduct] = useState({ name: '', description: '', price: '', image: '' });
-
+    const [openAdd, setOpenAdd] = useState(false);
+    const [newProduct, setNewProduct] = useState({ Id: '', name: '', description: '', price: '', image: '' });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const productsPerPage = 9;
 
     useEffect(() => {
-        axios.get('https://localhost:7055/gateway/Products')
+        fetchProducts(currentPage);
+    }, [currentPage]);
+
+    const fetchProducts = (page) => {
+        setLoading(true);
+        axios.get(`https://localhost:7055/gateway/Products?page=${page}&limit=${productsPerPage}`)
             .then(response => {
-                setProducts(response.data);
+                console.log('Server response:', response.data); 
+                const { items, totalPages } = response.data;
+                setProducts(items);
+                setTotalPages(totalPages);
             })
             .catch(error => {
                 console.error('Ошибка при получении данных о продуктах:', error);
+                setProducts([]);
+            })
+            .finally(() => {
+                setLoading(false);
             });
-    }, []);
-
-
-    const handleClickOpen = () => {
-        setOpen(true);
     };
 
-    const handleClose = () => {
-        setOpen(false);
-        setNewProduct({ name: '', description: '', price: '', image: '' });
+    const handleClickOpenAdd = () => {
+        setOpenAdd(true);
+    };
+
+    const handleCloseAdd = () => {
+        setOpenAdd(false);
+        setNewProduct({ Id: '', name: '', description: '', price: '', image: '' });
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNewProduct((prevProduct) => ({
             ...prevProduct,
-            "Id": "",
             [name]: value,
         }));
     };
 
     const handleAddProduct = () => {
-        axios.post('https://localhost:7055/gateway/Products', newProduct,{
+        axios.post('https://localhost:7055/gateway/Products', newProduct, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         })
-        .then(response => {
-            setProducts([...products, response.data]);
-            handleClose();
-        })
-        .catch(error => {
-            console.error('Ошибка при добавлении продукта:', error);
-        });
+            .then(response => {
+                setProducts([...products, response.data]);
+                handleCloseAdd();
+            })
+            .catch(error => {
+                console.error('Ошибка при добавлении продукта:', error);
+            });
+    };
+
+    const handleProductChange = (updatedProductOrId) => {
+        if (updatedProductOrId) {
+            if (typeof updatedProductOrId === 'object') {
+                setProducts(products.map(product => product.id === updatedProductOrId.id ? updatedProductOrId : product));
+            } else {
+                setProducts(products.filter(product => product.id !== updatedProductOrId));
+            }
+        }
+    };
+
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
     };
 
     return (
@@ -69,37 +85,39 @@ const ProductList = () => {
             <Typography variant="h4" gutterBottom>
                 Our Products
             </Typography>
-            <Grid container spacing={4}>
-                {products.map((product) => (
-                    <Grid item key={product.id} xs={12} sm={6} md={4}>
-                        <Card>
-                            <CardMedia
-                                component="img"
-                                height="140"
-                                image={product.image}
-                                alt={product.name}
+            {loading ? (
+                <CircularProgress />
+            ) : (
+                <Grid container spacing={4}>
+                    {products.map((product) => (
+                        <Grid item key={product.id} xs={12} sm={6} md={4}>
+                            <ProductCard
+                                product={product}
+                                onProductChange={handleProductChange}
                             />
-                            <CardContent>
-                                <Typography variant="h5" component="div">
-                                    {product.name}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {product.description}
-                                </Typography>
-                                <Typography variant="h6" component="div">
-                                    {product.price}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+                        </Grid>
+                    ))}
+                </Grid>
+            )}
             <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
-                <Button variant="contained" color="primary" onClick={handleClickOpen}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleClickOpenAdd}
+                    sx={{
+                        mt: 3,
+                        mb: 2,
+                        backgroundColor: 'darkviolet',
+                        '&:hover': {
+                            backgroundColor: 'purple',
+                        },
+                        color: 'white'
+                    }}
+                >
                     Add Product
                 </Button>
             </Grid>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={openAdd} onClose={handleCloseAdd}>
                 <DialogTitle>Add New Product</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -136,7 +154,7 @@ const ProductList = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleCloseAdd} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={handleAddProduct} color="primary">
@@ -144,6 +162,14 @@ const ProductList = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                shape="rounded"
+                color="secondary"
+                style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+            />
         </Container>
     );
 };
