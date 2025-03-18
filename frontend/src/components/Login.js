@@ -2,27 +2,29 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const { login } = useAuth();
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(null);
         try {
-            const response = await axios.post('https://localhost:7055/gateway/auth/login', {
+            const response = await axios.post('https://localhost:5001/gateway/auth/login', {
                 username,
                 password,
             });
-
-            // Сохраните токен в localStorage 
-            localStorage.setItem('token', response.data.token);
+            const data = await response.json();
+            login(data.token);
             console.log('Login successful:', response.data);
             navigate('/product');
         } catch (error) {
-            setError('Invalid username or password');
+            setError(error.message);
             console.error('Login failed:', error);
         }
     };

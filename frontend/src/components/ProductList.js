@@ -18,7 +18,7 @@ const ProductList = () => {
 
     const fetchProducts = (page) => {
         setLoading(true);
-        axios.get(`https://localhost:7055/gateway/Products?page=${page}&limit=${productsPerPage}`)
+        axios.get(`https://localhost:5001/gateway/Products?page=${page}&limit=${productsPerPage}`)
             .then(response => {
                 console.log('Server response:', response.data); 
                 const { items, totalPages } = response.data;

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{729C58C3-59CC-444D-BC9C-FB27987A42FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "UserService\AuthService.csproj", "{F468F9DC-4292-4177-8D85-0514880E8B7C}"
-EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "frontend", "frontend\", "{BEC1AF4D-7070-47DE-541E-D6A8B557E3AB}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8.1"
@@ -30,6 +28,10 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "frontend", "frontend\", "{B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProductService", "ProductService\ProductService.csproj", "{7F22FD99-D486-49A3-9406-9F90DDC59B2A}"
 EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{81DDED9D-158B-E303-5F62-77A2896D2A5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,10 +42,6 @@ Global
 		{729C58C3-59CC-444D-BC9C-FB27987A42FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{729C58C3-59CC-444D-BC9C-FB27987A42FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{729C58C3-59CC-444D-BC9C-FB27987A42FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F468F9DC-4292-4177-8D85-0514880E8B7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F468F9DC-4292-4177-8D85-0514880E8B7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F468F9DC-4292-4177-8D85-0514880E8B7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F468F9DC-4292-4177-8D85-0514880E8B7C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BEC1AF4D-7070-47DE-541E-D6A8B557E3AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BEC1AF4D-7070-47DE-541E-D6A8B557E3AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEC1AF4D-7070-47DE-541E-D6A8B557E3AB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
@@ -52,6 +50,14 @@ Global
 		{7F22FD99-D486-49A3-9406-9F90DDC59B2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F22FD99-D486-49A3-9406-9F90DDC59B2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F22FD99-D486-49A3-9406-9F90DDC59B2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDAB7B3-DE4F-6FF5-06F0-D824F083F1AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

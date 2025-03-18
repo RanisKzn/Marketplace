@@ -35,7 +35,7 @@ const ProductCard = ({ product, onProductChange }) => {
     };
 
     const handleEditProduct = () => {
-        axios.put(`https://localhost:7055/gateway/Products/${currentProduct.id}`, currentProduct, {
+        axios.put(`https://localhost:5001/gateway/Products/${currentProduct.id}`, currentProduct, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
