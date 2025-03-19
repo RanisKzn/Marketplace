@@ -1,10 +1,11 @@
-﻿import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Toolbar, Tabs, Tab, Button, Box } from '@mui/material';
+﻿import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Toolbar, Tabs, Tab, Button, Box } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
 
 const Header = ({ tabs, activeTabIndex, onTabChange }) => {
     const navigate = useNavigate();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { user, logout } = useAuth(); 
 
     const handleTabChange = (event, newValue) => {
         onTabChange(event, newValue);
@@ -13,15 +14,17 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
 
     const handleLogin = () => {
         onTabChange();
-        navigate('/login');
+        navigate("/login");
     };
 
     const handleLogout = () => {
-        setIsAuthenticated(false);
-        navigate('/');
+        logout();
+        navigate("/");
     };
+
     return (
         <Toolbar>
+            {/* Левый блок - вкладки */}
             <Box sx={{ flexGrow: 1 }}>
                 <Tabs value={activeTabIndex} onChange={handleTabChange} textColor="secondary" indicatorColor="secondary">
                     {tabs.map((tab, index) => (
@@ -29,22 +32,22 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
                     ))}
                 </Tabs>
             </Box>
+
+            {/* Правый блок - кнопки аутентификации */}
             <Box>
-                {isAuthenticated ? (
+                {user ? (
                     <Button
                         onClick={handleLogout}
                         variant="contained"
                         sx={{
                             mt: 3,
                             mb: 2,
-                            backgroundColor: 'darkviolet',
-                            '&:hover': {
-                                backgroundColor: 'purple',
-                            },
-                            color: 'white'
+                            backgroundColor: "darkviolet",
+                            "&:hover": { backgroundColor: "purple" },
+                            color: "white",
                         }}
                     >
-                        LOG OUT
+                        ВЫЙТИ
                     </Button>
                 ) : (
                     <Button
@@ -53,21 +56,17 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
                         sx={{
                             mt: 3,
                             mb: 2,
-                            backgroundColor: 'darkviolet',
-                            '&:hover': {
-                                backgroundColor: 'purple',
-                            },
-                            color: 'white'
+                            backgroundColor: "darkviolet",
+                            "&:hover": { backgroundColor: "purple" },
+                            color: "white",
                         }}
                     >
-                        LOG IN
+                        ВОЙТИ
                     </Button>
                 )}
             </Box>
         </Toolbar>
-
     );
-    
 };
 
 export default Header;

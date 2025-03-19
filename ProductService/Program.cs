@@ -34,7 +34,9 @@ builder.Services.AddAuthentication(x =>
         ValidateIssuer = false,
         ValidateAudience = false
     };
-});        
+});
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddCors(options =>
 {

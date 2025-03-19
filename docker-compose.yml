@@ -1,0 +1,76 @@
+
+services:
+  apigateway:
+    build: ./ApiGateway
+    container_name: apigateway
+    ports: 
+      - "5001:80" 
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    depends_on:
+      - authservice
+      - productservice
+
+
+  authservice:
+    build: ./AuthService
+    container_name: authservice
+    ports:
+      - "7001:80"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=AuthDb;Username=postgres;Password=1231
+      - ./certs:/https
+
+  productservice:
+    build: ./ProductService
+    container_name: productservice
+    ports:
+      - "6001:80"
+    depends_on:
+      - mongodb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__MongoDb=mongodb://mongodb:27017/productdb
+    volumes:
+      - ./certs:/https
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: AuthDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1231
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - apigateway
+
+volumes:
+  postgres_data:    

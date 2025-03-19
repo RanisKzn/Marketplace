@@ -1,5 +1,6 @@
 ﻿using AuthService.Controllers;
 using AuthService.DTOs;
+using AuthService.Models;
 
 namespace AuthService.Services
 {
@@ -7,5 +8,9 @@ namespace AuthService.Services
     {
         Task<string> RegisterAsync(RegisterModel model);
         Task<string> LoginAsync(LoginModel model);
+        Task<string> GenerateRefreshToken(User user);
+        Task<User> ValidateRefreshToken(string token);
+        Task<string> GenerateJWTAsync(User user);
+        Task DeleteTokensForUser(string userId);
     }
 }

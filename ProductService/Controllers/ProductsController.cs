@@ -20,25 +20,25 @@ namespace ProductService.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<PaginatedResponse<Product>>> Get([FromQuery] int page = 1, [FromQuery] int limit = 9)
+        public async Task<IActionResult> GetProducts(
+            [FromQuery] string? search,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? order = "asc",
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 10)
         {
-            int skip = (page - 1) * limit;
+            var (items, totalPages) = await _productService.GetProductsAsync(search, minPrice, maxPrice, sortBy, order, page, limit);
 
-            var products = await _productService.GetPaginatedAsync(skip, limit);
-            var totalProducts = (int)( await _productService.GetTotalCountAsync());
-
-            var response = new PaginatedResponse<Product>
+            var response = new
             {
-                Items = products,
-                TotalCount = totalProducts,
-                Page = page,
-                Limit = limit,
-                TotalPages = (int)Math.Ceiling(totalProducts / (double)limit)
+                Items = items,
+                TotalPages = totalPages
             };
 
             return Ok(response);
         }
-
         [HttpGet("{id:length(24)}")]
         [AllowAnonymous]
         public async Task<ActionResult<Product>> Get(string id)
@@ -54,7 +54,7 @@ namespace ProductService.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Post([FromBody]Product newProduct)
         {
             await _productService.CreateAsync(newProduct);
@@ -62,7 +62,7 @@ namespace ProductService.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(string id, [FromBody]Product updatedProduct)
         {
             var product = await _productService.GetAsync(id);
@@ -78,7 +78,7 @@ namespace ProductService.Controllers
         }
 
         [HttpDelete("{id:length(24)}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             var product = await _productService.GetAsync(id);

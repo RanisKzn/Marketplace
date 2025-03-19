@@ -3,11 +3,13 @@ import { Card, CardMedia, CardContent, CardActions, Typography, IconButton, Dial
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
+import { useAuth } from "../context/AuthContext";
 
 const ProductCard = ({ product, onProductChange }) => {
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [currentProduct, setCurrentProduct] = useState({ ...product });
+    const { user } = useAuth(); 
 
     const handleClickOpenEdit = () => {
         setCurrentProduct({ ...product });
@@ -35,7 +37,7 @@ const ProductCard = ({ product, onProductChange }) => {
     };
 
     const handleEditProduct = () => {
-        axios.put(`https://localhost:7055/gateway/Products/${currentProduct.id}`, currentProduct, {
+        axios.put(`http://localhost:5001/gateway/Products/${currentProduct.id}`, currentProduct, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -50,7 +52,7 @@ const ProductCard = ({ product, onProductChange }) => {
     };
 
     const handleDeleteProduct = () => {
-        axios.delete(`https://localhost:7055/gateway/Products/${currentProduct.id}`, {
+        axios.delete(`http://localhost:5001/gateway/Products/${currentProduct.id}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -84,14 +86,18 @@ const ProductCard = ({ product, onProductChange }) => {
                         {product.price}
                     </Typography>
                 </CardContent>
-                <CardActions>
-                    <IconButton aria-label="edit" onClick={handleClickOpenEdit}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton aria-label="delete" onClick={handleClickOpenDelete}>
-                        <DeleteIcon />
-                    </IconButton>
-                </CardActions>
+                {user ? (
+                    <CardActions>
+                        <IconButton aria-label="edit" onClick={handleClickOpenEdit}>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton aria-label="delete" onClick={handleClickOpenDelete}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </CardActions>
+                ) : ( 
+                    null
+                )}
             </Card>
             <Dialog open={openEdit} onClose={handleCloseEdit}>
                 <DialogTitle>Edit Product</DialogTitle>

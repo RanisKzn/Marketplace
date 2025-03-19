@@ -34,12 +34,14 @@ namespace AuthService.DataSeeders
                 UserName = "admin",
                 Email = adminEmail,
                 EmailConfirmed = true,
+                
             };
 
             if (await userManager.FindByNameAsync(adminUser.UserName) == null)
             {
                 await userManager.CreateAsync(adminUser, "Admin@123");
                 await userManager.AddToRoleAsync(adminUser, "Admin");
+                
             }
 
             var userEmail = "user@example.com";

@@ -16,7 +16,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddOcelot();
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication("Bearer")
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer("Bearer", options =>
             {
                 options.RequireHttpsMetadata = false;
@@ -29,7 +29,7 @@ builder.Services.AddAuthentication("Bearer")
                     ValidateAudience = false
                 };
             });
-
+builder.Services.AddAuthorization();
 
 
 builder.Services.AddCors(options =>
