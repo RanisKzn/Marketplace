@@ -13,6 +13,7 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
     };
 
     const handleLogin = () => {
+        onTabChange();
         navigate("/login");
     };
 

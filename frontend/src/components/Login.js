@@ -15,12 +15,11 @@ const Login = () => {
         e.preventDefault();
         setError(null);
         try {
-            const response = await axios.post('https://localhost:5001/gateway/auth/login', {
+            const response = await axios.post('http://localhost:5001/gateway/auth/login', {
                 username,
                 password,
             });
-            const data = await response.json();
-            login(data.token);
+            login(response.data.token);
             console.log('Login successful:', response.data);
             navigate('/product');
         } catch (error) {

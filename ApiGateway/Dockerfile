@@ -1,7 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-EXPOSE 5000
-EXPOSE 5001
+EXPOSE 80
 
 # Этап сборки
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -23,12 +22,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Копируем сертификат на последнем этапе, чтобы он не потерялся
-COPY certs/aspnetcore.pfx /https/aspnetcore.pfx
-
-# Настраиваем ASP.NET Core на использование сертификата
-ENV ASPNETCORE_URLS="https://+:5001;http://+:5000"
-ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/https/aspnetcore.pfx"
-ENV ASPNETCORE_Kestrel__Certificates__Default__Password="mypassword"
 
 ENTRYPOINT ["dotnet", "ApiGateway.dll"]

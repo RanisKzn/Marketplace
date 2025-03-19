@@ -4,8 +4,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 7000
-EXPOSE 7001
+EXPOSE 80
 
 
 # Этот этап используется для сборки проекта службы
@@ -22,12 +21,6 @@ RUN dotnet build "./AuthService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./AuthService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-COPY certs/aspnetcore.pfx /https/aspnetcore.pfx
-
-ENV ASPNETCORE_URLS="https://+:5001;http://+:5000"
-ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/https/aspnetcore.pfx"
-ENV ASPNETCORE_Kestrel__Certificates__Default__Password="mypassword"
 
 
 # Этот этап используется в рабочей среде или при запуске из VS в обычном режиме (по умолчанию, когда конфигурация отладки не используется)
