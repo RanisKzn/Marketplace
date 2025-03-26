@@ -25,7 +25,8 @@ export const AuthProvider = ({ children }) => {
                 const decoded = jwtDecode(token);
                 setUser({
                     username: decoded.sub,
-                    roles: decoded.role ? (Array.isArray(decoded.role) ? decoded.role : [decoded.role]) : [],
+                    roles: decoded.actort ? (Array.isArray(decoded.actort) ? decoded.actort : [decoded.actort]) : [],
+                    id: decoded.unique_name,
                 });
             } catch (error) {
                 console.error("Ошибка декодирования токена:", error);

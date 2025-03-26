@@ -1,14 +1,16 @@
 ﻿import React, { useState } from 'react';
-import { Card, CardMedia, CardContent, CardActions, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Card, CardMedia, CardContent, CardActions, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Snackbar, Alert } from '@mui/material'; import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { useAuth } from "../context/AuthContext";
+import { apiUrl } from "../config";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const ProductCard = ({ product, onProductChange }) => {
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [currentProduct, setCurrentProduct] = useState({ ...product });
+    const [cartSuccess, setCartSuccess] = useState(false);
     const { user } = useAuth(); 
 
     const handleClickOpenEdit = () => {
@@ -37,7 +39,7 @@ const ProductCard = ({ product, onProductChange }) => {
     };
 
     const handleEditProduct = () => {
-        axios.put(`http://localhost:5001/gateway/Products/${currentProduct.id}`, currentProduct, {
+        axios.put(apiUrl+`/gateway/Products/${currentProduct.id}`, currentProduct, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -52,7 +54,7 @@ const ProductCard = ({ product, onProductChange }) => {
     };
 
     const handleDeleteProduct = () => {
-        axios.delete(`http://localhost:5001/gateway/Products/${currentProduct.id}`, {
+        axios.delete(apiUrl+`/gateway/Products/${currentProduct.id}`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
@@ -63,6 +65,21 @@ const ProductCard = ({ product, onProductChange }) => {
             })
             .catch(error => {
                 console.error('Ошибка при удалении продукта:', error);
+            });
+    };
+
+    // Добавление товара в корзину
+    const handleAddToCart = () => {
+        if (!user) return;
+
+        axios.post(apiUrl + `/gateway/cart/${user.id}`, { productId: product.id, quantity: 1 }, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        })
+            .then(() => {
+                setCartSuccess(true); // Показ уведомления об успешном добавлении
+            })
+            .catch(error => {
+                console.error('Ошибка при добавлении в корзину:', error);
             });
     };
 
@@ -86,7 +103,7 @@ const ProductCard = ({ product, onProductChange }) => {
                         {product.price}
                     </Typography>
                 </CardContent>
-                {user ? (
+                {user && user.roles.includes("Admin") &&  (
                     <CardActions>
                         <IconButton aria-label="edit" onClick={handleClickOpenEdit}>
                             <EditIcon />
@@ -95,8 +112,11 @@ const ProductCard = ({ product, onProductChange }) => {
                             <DeleteIcon />
                         </IconButton>
                     </CardActions>
-                ) : ( 
-                    null
+                )}
+                {user && (
+                    <IconButton aria-label="add to cart" onClick={handleAddToCart} color="primary">
+                        <ShoppingCartIcon />
+                    </IconButton>
                 )}
             </Card>
             <Dialog open={openEdit} onClose={handleCloseEdit}>
@@ -158,6 +178,11 @@ const ProductCard = ({ product, onProductChange }) => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar open={cartSuccess} autoHideDuration={3000} onClose={() => setCartSuccess(false)}>
+                <Alert onClose={() => setCartSuccess(false)} severity="success">
+                    Товар добавлен в корзину!
+                </Alert>
+            </Snackbar>
         </>
     );
 };

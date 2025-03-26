@@ -17,6 +17,11 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
         navigate("/login");
     };
 
+    const handleCart = () => {
+        onTabChange();
+        navigate("/cart");
+    };
+
     const handleLogout = () => {
         logout();
         navigate("/");
@@ -36,6 +41,8 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
             {/* Правый блок - кнопки аутентификации */}
             <Box>
                 {user ? (
+                    <>
+                    <Button onClick={handleCart} color="secondary">КОРЗИНА</Button>
                     <Button
                         onClick={handleLogout}
                         variant="contained"
@@ -48,7 +55,8 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
                         }}
                     >
                         ВЫЙТИ
-                    </Button>
+                        </Button>
+                    </>
                 ) : (
                     <Button
                         onClick={handleLogin}
@@ -62,7 +70,8 @@ const Header = ({ tabs, activeTabIndex, onTabChange }) => {
                         }}
                     >
                         ВОЙТИ
-                    </Button>
+                        </Button>
+                    
                 )}
             </Box>
         </Toolbar>
