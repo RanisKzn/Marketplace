@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import ProductCard from './ProductCard';
 import { useAuth } from "../context/AuthContext";
+import { apiUrl } from "../config";
 
 const ProductList = () => {
     const [products, setProducts] = useState([]);
@@ -41,7 +42,7 @@ const ProductList = () => {
             limit: productsPerPage
         }).toString();
 
-        axios.get(`http://localhost:5001/gateway/Products?${query}`)
+        axios.get(`${apiUrl}/gateway/Products?${query}`)
             .then(response => {
                 const { items, totalPages } = response.data;
                 setProducts(items);
@@ -73,7 +74,7 @@ const ProductList = () => {
     };
 
     const handleAddProduct = () => {
-        axios.post('http://localhost:5001/gateway/Products', newProduct, {
+        axios.post(`${apiUrl}/gateway/Products`, newProduct, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
             .then(response => {
@@ -104,7 +105,7 @@ const ProductList = () => {
 
             {/* Фильтры */}
             <Grid container spacing={2} alignItems="center" style={{ marginBottom: "20px" }}>
-                <Grid item xs={12} sm={4}>
+                <Grid item xs={12} sm={12}>
                     <TextField
                         name="search"
                         label="Поиск"
@@ -133,19 +134,19 @@ const ProductList = () => {
                         fullWidth
                     />
                 </Grid>
-                <Grid item xs={6} sm={3}>
+                <Grid item xs={6} sm={2}>
                     <Select name="sortBy" value={filters.sortBy} onChange={handleFilterChange} fullWidth>
                         <MenuItem value="price">Цена</MenuItem>
                         <MenuItem value="name">Название</MenuItem>
                     </Select>
                 </Grid>
-                <Grid item xs={6} sm={3}>
+                <Grid item xs={6} sm={2}>
                     <Select name="order" value={filters.order} onChange={handleFilterChange} fullWidth>
                         <MenuItem value="asc">По возрастанию</MenuItem>
                         <MenuItem value="desc">По убыванию</MenuItem>
                     </Select>
                 </Grid>
-                <Grid item xs={12} sm={3}>
+                <Grid item xs={12} sm={4}>
                     <Button variant="contained" color="primary" onClick={handleResetFilters} fullWidth>Сбросить</Button>
                 </Grid>
             </Grid>
@@ -154,7 +155,7 @@ const ProductList = () => {
             {loading ? (
                 <CircularProgress />
             ) : (
-                <Grid container spacing={4}>
+                <Grid container spacing={4} >
                     {products.map((product) => (
                         <Grid item key={product.id} xs={12} sm={6} md={4}>
                             <ProductCard product={product} />
@@ -164,7 +165,7 @@ const ProductList = () => {
             )}
 
             {/* Кнопка "Добавить товар" */}
-            {user && (
+            {user && user.roles.includes("Admin")  && (
                 <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
                     <Button
                         variant="contained"

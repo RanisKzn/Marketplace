@@ -41,6 +41,19 @@ services:
     volumes:
       - ./certs:/https
 
+  cartservice:
+    build: ./CartService
+    container_name: cartservice
+    ports:
+      - "8001:80"
+    depends_on:
+      - redis
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - redis=redis:6379
+
+
   redis:
     image: redis:latest
     restart: always

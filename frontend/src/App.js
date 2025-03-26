@@ -6,12 +6,13 @@ import ProductList from "./components/ProductList";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import { Box } from "@mui/material";
+import CartPage from "./components/CartPage";
 
 function App() {
     const [activeTabIndex, setActiveTabIndex] = useState(0);
 
     const tabs = [
-        { name: "Products", path: "/products", component: <ProductList /> },
+        { name: "“Œ¬¿–€", path: "/products", component: <ProductList /> },
     ];
 
     const handleTabChange = (event, newValue) => {
@@ -45,6 +46,7 @@ function App() {
                     <Routes>
                         <Route path="/products" element={<ProductList />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/cart" element={<CartPage />} />
                         <Route path="/register" element={<Register />} />
                         <Route path="*" element={<Navigate to="/products" />} />
                     </Routes>

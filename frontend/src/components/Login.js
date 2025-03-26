@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { useAuth } from "../context/AuthContext";
+import { apiUrl } from "../config";
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -15,7 +16,7 @@ const Login = () => {
         e.preventDefault();
         setError(null);
         try {
-            const response = await axios.post('http://localhost:5001/gateway/auth/login', {
+            const response = await axios.post(apiUrl + '/gateway/auth/login', {
                 username,
                 password,
             });

@@ -1,24 +1,13 @@
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*",
-  "Jwt": {
-    "Key": "YourSecretKeyHere!YourSecretKeyHere!YourSecretKeyHere!"
-  },
-  "Routes": [
-
+"Routes": [
     {
       ///api/Auth/login
       "DownstreamPathTemplate": "/api/Auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "authservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 7000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Auth/login",
@@ -30,8 +19,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "authservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 7000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Auth/register",
@@ -43,8 +32,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "authservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 7000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Auth/refresh-token",
@@ -56,8 +45,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "authservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 7000
         }
       ],
       "AuthenticationOptions": {
@@ -72,8 +61,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "productservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 6000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Products",
@@ -85,8 +74,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "productservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 6000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Products/{id}",
@@ -98,8 +87,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "productservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 6000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Products",
@@ -115,89 +104,20 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "productservice",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 6000
         }
       ],
       "UpstreamPathTemplate": "/gateway/Products/{Id}",
-      "UpstreamHttpMethod": [ "DELETE", "PUT", "GET" ],
+      "UpstreamHttpMethod": [ "DELETE", "PUT" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedRoles": [ "Admin" ]
       }
-    },
-    //aoi/Cart/{userId}
-    {
-      "DownstreamPathTemplate": "/api/Cart/{userId}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "cartservice",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/Cart/{userId}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedRoles": []
-      }
-    },
-    //api/Cart/{userId}
-    {
-      "DownstreamPathTemplate": "/api/Cart/{userId}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "cartservice",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/Cart/{userId}",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedRoles": []
-      }
-    },
-    //api/Cart/{userId}/{productId}
-    {
-      "DownstreamPathTemplate": "/api/Cart/{userId}/{productId}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "cartservice",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/Cart/{userId}/{productId}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedRoles": []
-      }
-    },
-   
-    //api/Cart/{Id}
-    {
-      "DownstreamPathTemplate": "/api/cart/{userId}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "cartservice",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/cart/{userId}",
-      "UpstreamHttpMethod": [ "DELETE" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedRoles": []
-      }
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://apigateway:80",
+    "BaseUrl": "http://localhost:5000",
     "HttpHandlerOptions": {
       "AllowAutoRedirect": false,
       "UseCookieContainer": false,
@@ -205,4 +125,4 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     }
   }
-}
+ }

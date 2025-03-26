@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
+import { apiUrl } from "../config";
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -11,7 +12,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5001/gateway/auth/register', {
+            const response = await axios.post(apiUrl+'/gateway/auth/register', {
                 username,
                 email,
                 password,
