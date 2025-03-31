@@ -50,6 +50,7 @@ services:
       - redis
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=CartDb;Username=postgres;Password=1231
       - ASPNETCORE_URLS=http://+:80
       - redis=redis:6379
 
@@ -64,7 +65,6 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: AuthDb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1231
     ports:
@@ -78,12 +78,12 @@ services:
     ports:
       - "27017:27017"
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - apigateway
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - apigateway
 
 volumes:
   postgres_data:    
