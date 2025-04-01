@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Container, Typography, Grid, Button, CircularProgress } from '@mui/material';
 import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
+import { apiUrl } from "../config";
 
 const CartPage = () => {
     const { user } = useAuth();
@@ -18,10 +19,12 @@ const CartPage = () => {
     const fetchCart = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:5001/gateway/cart/${user.id}`, {
+            const response = await axios.get(apiUrl +`/gateway/Cart/${user.id}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            setCartItems(response.data);
+            const productIds = response.data.map(item => item.productId).join(',');
+            const productsResponse = await axios.get(apiUrl + `/gateway/Products?ids=${productIds}`);
+            setCartItems(productsResponse.data.products);
         } catch (error) {
             console.error('Ошибка загрузки корзины:', error);
         } finally {
@@ -31,7 +34,7 @@ const CartPage = () => {
 
     const handleRemoveItem = async (productId) => {
         try {
-            await axios.delete(`http://localhost:5001/gateway/cart/${user.id}/${productId}`, {
+            await axios.delete(apiUrl +`/gateway/cart/${user.id}/${productId}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             setCartItems(cartItems.filter(item => item.id !== productId));
@@ -42,7 +45,7 @@ const CartPage = () => {
 
     const handleClearCart = async () => {
         try {
-            await axios.delete(`http://localhost:5001/gateway/cart/${user.id}`, {
+            await axios.delete(apiUrl +`/gateway/cart/${user.id}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
             setCartItems([]);

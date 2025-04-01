@@ -10,6 +10,7 @@ namespace ProductService.Services
         Task CreateAsync(Product newProduct);
         Task UpdateAsync(string id, Product updatedProduct);
         Task RemoveAsync(string id);
+        Task<List<Product>> GetProductsByIds(List<string> ids);
         IMongoCollection<Product> GetProductCollection();
         Task<long> GetTotalCountAsync();
     }

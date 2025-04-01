@@ -72,7 +72,7 @@ const ProductCard = ({ product, onProductChange }) => {
     const handleAddToCart = () => {
         if (!user) return;
 
-        axios.post(apiUrl + `/gateway/cart/${user.id}`, { productId: product.id, quantity: 1 }, {
+        axios.post(apiUrl + `/gateway/cart/`, { userId: user.id, productId: product.id, quantity: 1 }, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
             .then(() => {
