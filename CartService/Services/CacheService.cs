@@ -1,35 +1,33 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using System.Text.Json;
 
 namespace CartService.Services
 {
     public class CacheService : ICacheService
     {
-        private readonly IDistributedCache _cache;
+        private readonly IDatabase _cache;
 
-        public CacheService(IDistributedCache cache)
+        public CacheService(IConnectionMultiplexer redis)
         {
-            _cache = cache;
+            _cache = redis.GetDatabase();
         }
 
         public async Task<T?> GetAsync<T>(string key)
         {
-            var cachedData = await _cache.GetStringAsync(key);
-            return cachedData == null ? default : JsonSerializer.Deserialize<T>(cachedData);
+            var cachedData = await _cache.StringGetAsync(key);
+            return cachedData.HasValue ? JsonSerializer.Deserialize<T>(cachedData!) : default;
         }
 
         public async Task SetAsync<T>(string key, T value, TimeSpan expiration)
         {
-            var options = new DistributedCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = expiration
-            };
-            await _cache.SetStringAsync(key, JsonSerializer.Serialize(value), options);
+            var jsonData = JsonSerializer.Serialize(value);
+            await _cache.StringSetAsync(key, jsonData, expiration);
         }
 
         public async Task RemoveAsync(string key)
         {
-            await _cache.RemoveAsync(key);
+            await _cache.KeyDeleteAsync(key);
         }
     }
 }

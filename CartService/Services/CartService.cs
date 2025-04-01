@@ -38,9 +38,11 @@ namespace CartService.Services
             if (cart != null)
             {
                 await _cacheService.SetAsync(cacheKey, cart, _cacheTimeout);
+                return cart.Items.ToList();
             }
 
-            return cart.Items.ToList(); 
+
+            return new List<CartItem>();
         }
 
         public async Task UpdateCartAsync(CartDto cartDto)
@@ -56,42 +58,40 @@ namespace CartService.Services
                 Cart cart = new Cart
                 {
                     UserId = cartDto.UserId,
-                    Items = new List<CartItem>()
+                    Items = new List<CartItem>
+                    {
+                        new CartItem
+                        {
+                            ProductId = cartDto.ProductId,
+                            Quantity = cartDto.Quantity
+                        }
+                    }
                 };
-
-                CartItem newCartItem = new CartItem
-                {
-                    ProductId = cartDto.ProductId,
-                    Quantity = cartDto.Quantity
-                };
-                cart.Items.Add(newCartItem);
-                _dbContext.Carts.Update(cart);
-                await _dbContext.SaveChangesAsync();
-                await _cacheService.SetAsync(cacheKey, cart, _cacheTimeout);
+                _dbContext.Carts.Add(cart);
             }
-
-            var cartItem = cartDb.Items.Find(c => c.ProductId == cartDto.ProductId);
-            if(cartItem == null)
+            else
             {
-                CartItem newCartItem = new CartItem
+                var existingItem = cartDb.Items.FirstOrDefault(i => i.ProductId == cartDto.ProductId);
+                if (existingItem != null)
                 {
-                    ProductId = cartDto.ProductId,
-                    Quantity = cartDto.Quantity
-                };
-                cartDb.Items.Add(newCartItem);
+                    existingItem.Quantity += cartDto.Quantity;
+                }
+                else
+                {
+                    CartItem cartItem = new CartItem
+                    {
+                        ProductId = cartDto.ProductId,
+                        Quantity = cartDto.Quantity
+                    };
+                    cartDb.Items.Add(cartItem);
+                    _dbContext.CartItems.Add(cartItem);
+                }
+                
                 _dbContext.Carts.Update(cartDb);
-                await _dbContext.SaveChangesAsync();
-                await _cacheService.SetAsync(cacheKey, cartDb, _cacheTimeout);
             }
 
-            cartItem.Quantity += cartDto.Quantity;
-
-            _dbContext.Carts.Update(cartDb);
             await _dbContext.SaveChangesAsync();
-
             await _cacheService.SetAsync(cacheKey, cartDb, _cacheTimeout);
-
-            
         }
 
         public async Task ClearCartAsync(string userId)
@@ -113,7 +113,10 @@ namespace CartService.Services
         {
             string cacheKey = $"{CartPrefix}{userId}";
 
-            var cart = await _dbContext.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
+            var cart = await _dbContext.Carts.
+                Include(c => c.Items).
+                FirstOrDefaultAsync(c => c.UserId == userId);
+
             var cartItem = cart.Items.Find(x => x.ProductId == productId);
             if (cartItem != null)
             {

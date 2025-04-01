@@ -9,7 +9,6 @@ namespace CartService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
