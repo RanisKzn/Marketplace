@@ -1,5 +1,5 @@
 {
-"Routes": [
+  "Routes": [
     {
       ///api/Auth/login
       "DownstreamPathTemplate": "/api/Auth/login",
@@ -113,6 +113,75 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedRoles": [ "Admin" ]
+      }
+    },
+    //aoi/Cart/{userId}
+    {
+      "DownstreamPathTemplate": "/api/Cart/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Cart/{userId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
+    },
+    //api/Cart/{userId}
+    {
+      "DownstreamPathTemplate": "/api/Cart/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Cart/",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
+    },
+    //api/Cart/{userId}/{productId}
+    {
+      "DownstreamPathTemplate": "/api/Cart/{userId}/{productId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Cart/{userId}/{productId}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
+    },
+
+    //api/Cart/{Id}
+    {
+      "DownstreamPathTemplate": "/api/Cart/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Cart/{userId}",
+      "UpstreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
       }
     }
   ],

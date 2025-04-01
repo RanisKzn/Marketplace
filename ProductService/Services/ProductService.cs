@@ -19,6 +19,11 @@ namespace ProductService.Services
         {
             return _products;
         }
+        public async Task<List<Product>> GetProductsByIds(List<string> ids) 
+        {
+            var filter = Builders<Product>.Filter.In(p => p.Id, ids);
+            return await _products.Find(filter).ToListAsync(); 
+        }
 
         public async Task<List<Product>> GetAsync() =>
             await _products.Find(_ => true).ToListAsync();

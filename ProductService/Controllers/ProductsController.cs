@@ -6,7 +6,7 @@ using ProductService.Services;
 
 namespace ProductService.Controllers
 {
-    
+
     [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
@@ -26,9 +26,20 @@ namespace ProductService.Controllers
             [FromQuery] decimal? maxPrice,
             [FromQuery] string? sortBy,
             [FromQuery] string? order = "asc",
+            [FromQuery] List<string>? ids = null,
             [FromQuery] int page = 1,
-            [FromQuery] int limit = 10)
+            [FromQuery] int limit = 10
+            )
         {
+            if(ids != null)
+            {
+                var products = await _productService.GetProductsByIds(ids);
+                if (products is null)
+                {
+                    return NotFound();
+                }
+                return Ok(new { Products = products });
+            }
             var (items, totalPages) = await _productService.GetProductsAsync(search, minPrice, maxPrice, sortBy, order, page, limit);
 
             var response = new
