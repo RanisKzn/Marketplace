@@ -22,7 +22,7 @@ namespace CartService.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetCart(string userId)
         {
-            var cart = await _cartService.GetCartItemAsync(userId);
+            var cart = await _cartService.GetCartAsync(userId);
             if (cart is null)
             {
                 return NotFound();
@@ -30,25 +30,25 @@ namespace CartService.Controllers
             return Ok(cart);
         }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> AddItemToCart(string userId, [FromBody] CartItem item)
+        [HttpPost]
+        public async Task<IActionResult> UpdateCart([FromBody] CartDto cart)
         {
-            await _cartService.AddToCartAsync(userId, item);
-            return Ok();
+            await _cartService.UpdateCartAsync(cart);
+            return Ok(new { message = "Корзина обновлена." });
         }
 
         [HttpDelete("{userId}/{productId}")]
         public async Task<IActionResult> RemoveItemFromCart(string userId, string productId)
         {
-            await _cartService.RemoveFromCartAsync(userId, productId);
-            return Ok();
+            await _cartService.RemoveCartItemAsync(userId, productId);
+            return Ok(new { message = "Товар удален." });
         }
 
         [HttpDelete("{userId}")]
         public async Task<IActionResult> ClearCart(string userId)
         {
             await _cartService.ClearCartAsync(userId);
-            return Ok();
+            return Ok(new { message = "Корзина очищена." });
         }
     }
 }

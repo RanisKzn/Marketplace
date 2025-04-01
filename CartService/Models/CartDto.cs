@@ -1,8 +1,8 @@
 ﻿namespace CartService.Models
 {
-    public class CartItem
+    public class CartDto
     {
-        public Guid CartItemId { get; set; } = Guid.NewGuid();
+        public string UserId { get; set; }
         public string ProductId { get; set; }
         public int Quantity { get; set; }
     }
