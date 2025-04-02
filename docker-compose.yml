@@ -79,12 +79,12 @@ services:
     ports:
       - "27017:27017"
 
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - apigateway
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - apigateway
 
 volumes:
   postgres_data:    

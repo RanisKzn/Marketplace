@@ -183,6 +183,40 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedRoles": []
       }
+    },
+    //api/Order/{Id}
+    {
+      "DownstreamPathTemplate": "/api/Order/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Order/{userId}",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
+    },
+    //api/Order/
+    {
+      "DownstreamPathTemplate": "/api/Order/",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 8000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Order/",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
     }
   ],
   "GlobalConfiguration": {
