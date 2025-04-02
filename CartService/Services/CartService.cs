@@ -4,7 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace CartService.Services
 {
@@ -14,84 +16,138 @@ namespace CartService.Services
         private readonly ICacheService _cacheService;
         private readonly TimeSpan _cacheTimeout;
         private const string CartPrefix = "cart:";
+        private readonly HttpClient _httpClient;
+        private const string productservice = "localhost:6000";
 
-        public CartService(CartDbContext dbContext, ICacheService cacheService)
+        public CartService(CartDbContext dbContext, ICacheService cacheService, HttpClient httpClient)
         {
             _dbContext = dbContext;
             _cacheService = cacheService;
+            _httpClient = httpClient;
             _cacheTimeout = TimeSpan.FromMinutes(10);
         }
 
-        public async Task<List<CartItem>> GetCartAsync(string userId)
+        public async Task<CartWithProductsDto> GetCartAsync(string userId)
         {
             string cacheKey = $"{CartPrefix}{userId}";
             var cachedCart = await _cacheService.GetAsync<Cart>(cacheKey);
-            if (cachedCart != null)
-            {
-                return cachedCart.Items.ToList();
-            }
 
-            var cart = await _dbContext.Carts
+            if (cachedCart == null)
+            {
+                cachedCart = await _dbContext.Carts
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
-
-            if (cart != null)
-            {
-                await _cacheService.SetAsync(cacheKey, cart, _cacheTimeout);
-                return cart.Items.ToList();
+                if (cachedCart == null)
+                {
+                     return new CartWithProductsDto();
+                }
+               
+                await _cacheService.SetAsync(cacheKey, cachedCart, _cacheTimeout);
             }
 
+            var productIds = cachedCart.Items.Select(i => i.ProductId).Distinct().ToList();
+            var productDetails = new List<CartProductDto>();
 
-            return new List<CartItem>();
+            foreach (var productId in productIds)
+            {
+                string productCacheKey = $"cart_products:{productId}";
+                var cachedProduct = await _cacheService.GetAsync<CartProductDto>(productCacheKey);
+
+                if (cachedProduct != null)
+                {
+                    productDetails.Add(cachedProduct);
+                }
+            }
+
+            var missingProductIds = productIds
+                .Where(id => productDetails.All(p => p.Id != id))
+                .ToList();
+
+            if (missingProductIds.Any())
+            {
+                var qwe = $"http://{productservice}/api/products?ids={string.Join(",", missingProductIds)}";
+                var response = await _httpClient.GetAsync(qwe);
+                var products = await response.Content.ReadFromJsonAsync<CartWithProductsDto>();
+
+                if (products != null)
+                {
+                    foreach (var product in products.Products)
+                    {
+                        string productCacheKey = $"cart_products:{product.Id}";
+                        await _cacheService.SetAsync(productCacheKey, product, _cacheTimeout);
+                        productDetails.Add(product);
+                    }
+                }
+            }
+
+            var cartWithProducts = new CartWithProductsDto
+            {
+                Products = cachedCart.Items.Select(item => new CartProductDto
+                {
+                    Id = item.ProductId,
+                    Quantity = item.Quantity,
+                    Name = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Name ?? "Неизвестный товар",
+                    Description = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Description ?? "Описание",
+                    Price = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Price ?? 0,
+                    Image = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Id
+                }).ToList()
+            };
+
+            return cartWithProducts;
         }
 
         public async Task UpdateCartAsync(CartDto cartDto)
         {
             string cacheKey = $"{CartPrefix}{cartDto.UserId}";
 
-            var cartDb = await _dbContext.Carts
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+
+            var cart = await _dbContext.Carts
                 .Include(c => c.Items)
                 .FirstOrDefaultAsync(c => c.UserId == cartDto.UserId);
 
-            if (cartDb == null)
+            if (cart == null)
             {
-                Cart cart = new Cart
+                cart = new Cart
                 {
                     UserId = cartDto.UserId,
                     Items = new List<CartItem>
                     {
-                        new CartItem
+                        new()
                         {
                             ProductId = cartDto.ProductId,
                             Quantity = cartDto.Quantity
                         }
                     }
                 };
-                _dbContext.Carts.Add(cart);
+
+                await _dbContext.Carts.AddAsync(cart);
             }
             else
             {
-                var existingItem = cartDb.Items.FirstOrDefault(i => i.ProductId == cartDto.ProductId);
+                var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == cartDto.ProductId);
+
                 if (existingItem != null)
                 {
                     existingItem.Quantity += cartDto.Quantity;
                 }
                 else
                 {
-                    CartItem cartItem = new CartItem
+                    var newCartItem = new CartItem
                     {
                         ProductId = cartDto.ProductId,
                         Quantity = cartDto.Quantity
                     };
-                    cartDb.Items.Add(cartItem);
-                    _dbContext.CartItems.Add(cartItem);
+
+                    cart.Items.Add(newCartItem);
+                    await _dbContext.CartItems.AddAsync(newCartItem);
                 }
-                
-                _dbContext.Carts.Update(cartDb);
             }
 
             await _dbContext.SaveChangesAsync();
-            await _cacheService.SetAsync(cacheKey, cartDb, _cacheTimeout);
+            await transaction.CommitAsync();
+
+            await _cacheService.SetAsync(cacheKey, cart, _cacheTimeout);
         }
 
         public async Task ClearCartAsync(string userId)

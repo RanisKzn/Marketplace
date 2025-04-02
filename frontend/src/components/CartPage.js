@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Grid, Button, CircularProgress } from '@mui/material';
-import ProductCard from '../components/ProductCard';
+import CartItem from '../components/CartItem';
 import { useAuth } from '../context/AuthContext';
 import { apiUrl } from "../config";
 
@@ -22,9 +22,7 @@ const CartPage = () => {
             const response = await axios.get(apiUrl +`/gateway/Cart/${user.id}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
             });
-            const productIds = response.data.map(item => item.productId).join(',');
-            const productsResponse = await axios.get(apiUrl + `/gateway/Products?ids=${productIds}`);
-            setCartItems(productsResponse.data.products);
+            setCartItems(response.data.products);
         } catch (error) {
             console.error('Ошибка загрузки корзины:', error);
         } finally {
@@ -34,10 +32,18 @@ const CartPage = () => {
 
     const handleRemoveItem = async (productId) => {
         try {
-            await axios.delete(apiUrl +`/gateway/cart/${user.id}/${productId}`, {
-                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-            });
             setCartItems(cartItems.filter(item => item.id !== productId));
+        } catch (error) {
+            console.error('Ошибка при удалении товара из корзины:', error);
+        }
+    };
+    const handleUpdateItem = async (productId, newQuantity) => {
+        try {
+            setCartItems(prevCartItems =>
+                prevCartItems.map(item =>
+                    item.id === productId ? { ...item, quantity: item.quantity + newQuantity } : item
+                )
+            );
         } catch (error) {
             console.error('Ошибка при удалении товара из корзины:', error);
         }
@@ -53,6 +59,21 @@ const CartPage = () => {
             console.error('Ошибка при очистке корзины:', error);
         }
     };
+    const handleCheckout = () => {
+        if (!user) return;
+
+        axios.post(apiUrl+`/gateway/orders`, { userId: user.id, items: cartItems }, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        })
+            .then(() => {
+                setCartItems([]); // Очистить корзину после заказа
+                alert("Заказ успешно оформлен!");
+            })
+            .catch(error => {
+                console.error('Ошибка при оформлении заказа:', error);
+            });
+    };
+    const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
     return (
         <Container>
@@ -65,23 +86,29 @@ const CartPage = () => {
                 <Grid container spacing={4}>
                     {cartItems.map((product) => (
                         <Grid item key={product.id} xs={12} sm={6} md={4}>
-                            <ProductCard
-                                product={product}
-                                onRemove={() => handleRemoveItem(product.id)}
-                            />
+                            <CartItem product={product} onUpdate={handleUpdateItem} onRemove={handleRemoveItem} />
                         </Grid>
                     ))}
                 </Grid>
             )}
             {cartItems.length > 0 && (
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleClearCart}
-                    sx={{ marginTop: 3 }}
-                >
-                    Очистить корзину
-                </Button>
+                <Grid container justifyContent="space-between" alignItems="center" spacing={2} sx={{ mt: 3 }}>
+                    <Grid item>
+                        <Button variant="contained" color="secondary" onClick={handleClearCart}>
+                            Очистить корзину
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="h5" align="center">
+                            Общая сумма: <strong>{totalPrice} ₽</strong>
+                        </Typography>
+                    </Grid>
+                    <Grid item>
+                        <Button variant="contained" color="primary" onClick={handleCheckout}>
+                            Оформить заказ
+                        </Button>
+                    </Grid>
+                </Grid>
             )}
         </Container>
     );
