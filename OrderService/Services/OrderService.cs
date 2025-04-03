@@ -1,4 +1,5 @@
-﻿using OrderService.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using OrderService.Data;
 using OrderService.Models;
 
 namespace OrderService.Services
@@ -17,10 +18,20 @@ namespace OrderService.Services
             if (String.IsNullOrEmpty(UserId))
             {
                 throw new Exception("Orders is empty");
+
             }
 
+            var orderList =  await _dbContext.Orders
+                .Include(c => c.Items)
+                .Where(c => c.UserId == UserId)
+                .ToListAsync();
 
-            return new List<Order>();
+            if (orderList == null)
+            {
+                return new List<Order>();
+            }
+
+            return orderList;
         }
 
         public async Task<Order> CreateOrderAsync(string UserId, List<OrderDto> orderDto)
@@ -40,13 +51,13 @@ namespace OrderService.Services
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    Price = item.Price // Можно добавить логику расчета стоимости
+                    Price = item.Price 
                 }).ToList(),
-                TotalPrice = orderDto.Sum(item => item.Price)
+                TotalPrice = orderDto.Sum(item => item.Price * item.Quantity)
             };
 
             // Сохраняем заказ в базу данных
-            _dbContext.Orders.Add(order);
+            _dbContext.Orders.AddAsync(order);
             await _dbContext.SaveChangesAsync();
 
             // Возвращаем заказ

@@ -23,8 +23,8 @@ namespace OrderService.Controllers
         {
             try
             {
-                var orders = await _orderService.GetOrders(userId);
-                return Ok(orders);
+                var order = await _orderService.GetOrders(userId);
+                return Ok(order);
             }
             catch (Exception ex)
             {
@@ -32,8 +32,8 @@ namespace OrderService.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateOrder(string userId, [FromBody] List<OrderDto> orderDto)
+        [HttpPost("{userId}")]
+        public async Task<IActionResult> CreateOrder( string userId, [FromBody] List<OrderDto> orderDto)
         {
             try
             {

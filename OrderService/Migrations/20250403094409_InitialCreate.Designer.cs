@@ -12,7 +12,7 @@ using OrderService.Data;
 namespace OrderService.Migrations
 {
     [DbContext(typeof(OrderDbContext))]
-    [Migration("20250402131606_InitialCreate")]
+    [Migration("20250403094409_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -52,16 +52,11 @@ namespace OrderService.Migrations
 
             modelBuilder.Entity("OrderService.Models.OrderItem", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid?>("OrderId1")
+                    b.Property<Guid?>("OrderId")
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
@@ -76,7 +71,7 @@ namespace OrderService.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId1");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderItems");
                 });
@@ -85,7 +80,7 @@ namespace OrderService.Migrations
                 {
                     b.HasOne("OrderService.Models.Order", null)
                         .WithMany("Items")
-                        .HasForeignKey("OrderId1");
+                        .HasForeignKey("OrderId");
                 });
 
             modelBuilder.Entity("OrderService.Models.Order", b =>

@@ -66,6 +66,18 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<OrderDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        throw new Exception(ex.Message);
+    }
+}
 
 app.Run();

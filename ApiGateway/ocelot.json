@@ -186,33 +186,16 @@
     },
     //api/Order/{Id}
     {
-      "DownstreamPathTemplate": "/api/Order/{userId}",
+      "DownstreamPathTemplate": "/api/Orders/{userId}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 8000
+          "Port": 9000
         }
       ],
-      "UpstreamPathTemplate": "/gateway/Order/{userId}",
-      "UpstreamHttpMethod": [ "POST" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedRoles": []
-      }
-    },
-    //api/Order/
-    {
-      "DownstreamPathTemplate": "/api/Order/",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 8000
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/Order/",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamPathTemplate": "/gateway/Orders/{userId}",
+      "UpstreamHttpMethod": [ "POST", "GET" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedRoles": []
