@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Typography, Grid, Button, CircularProgress } from '@mui/material';
+import { Container, Typography, Grid, Button, CircularProgress, Snackbar, Alert } from '@mui/material';
 import CartItem from '../components/CartItem';
 import { useAuth } from '../context/AuthContext';
 import { apiUrl } from "../config";
@@ -8,6 +8,7 @@ import { apiUrl } from "../config";
 const CartPage = () => {
     const { user } = useAuth();
     const [cartItems, setCartItems] = useState([]);
+    const [orderSuccess, setOrderSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -62,12 +63,18 @@ const CartPage = () => {
     const handleCheckout = () => {
         if (!user) return;
 
-        axios.post(apiUrl+`/gateway/orders`, { userId: user.id, items: cartItems }, {
+        const orderDtos = cartItems.map(item => ({
+            ProductId: item.id,
+            Quantity: item.quantity,
+            Price: item.price
+        }));
+
+        axios.post(apiUrl + `/gateway/orders/${user.id}`, orderDtos , {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
         })
             .then(() => {
-                setCartItems([]); // Очистить корзину после заказа
-                alert("Заказ успешно оформлен!");
+                handleClearCart(); // Очистить корзину после заказа
+                setOrderSuccess(true); 
             })
             .catch(error => {
                 console.error('Ошибка при оформлении заказа:', error);
@@ -110,7 +117,13 @@ const CartPage = () => {
                     </Grid>
                 </Grid>
             )}
+            <Snackbar open={orderSuccess} autoHideDuration={3000} onClose={() => setOrderSuccess(false)}>
+                <Alert onClose={() => setOrderSuccess(false)} severity="success">
+                    Заказ успешно оформлен!
+                </Alert>
+            </Snackbar>
         </Container>
+
     );
 };
 

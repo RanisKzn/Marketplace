@@ -26,14 +26,15 @@ namespace ProductService.Controllers
             [FromQuery] decimal? maxPrice,
             [FromQuery] string? sortBy,
             [FromQuery] string? order = "asc",
-            [FromQuery] List<string>? ids = null,
+            [FromQuery] string? ids = null,
             [FromQuery] int page = 1,
             [FromQuery] int limit = 10
             )
         {
             if(ids != null)
             {
-                var products = await _productService.GetProductsByIds(ids);
+                var idList = ids.Split(',').ToList(); 
+                var products = await _productService.GetProductsByIds(idList);
                 if (products is null)
                 {
                     return NotFound();

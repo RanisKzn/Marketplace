@@ -183,6 +183,23 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedRoles": []
       }
+    },
+    //api/Order/{Id}
+    {
+      "DownstreamPathTemplate": "/api/Orders/{userId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 9000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Orders/{userId}",
+      "UpstreamHttpMethod": [ "POST", "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": []
+      }
     }
   ],
   "GlobalConfiguration": {

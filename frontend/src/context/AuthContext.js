@@ -42,7 +42,8 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("token", token);
             setUser({
                 username: decoded.sub,
-                roles: decoded.role ? (Array.isArray(decoded.role) ? decoded.role : [decoded.role]) : [],
+                roles: decoded.actort ? (Array.isArray(decoded.actort) ? decoded.actort : [decoded.actort]) : [],
+                id: decoded.unique_name,
             });
         } catch (error) {
             console.error("Ошибка декодирования токена при входе:", error);
