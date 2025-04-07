@@ -54,6 +54,42 @@ services:
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=CartDb;Username=postgres;Password=1231
       - ASPNETCORE_URLS=http://+:80
       - redis=redis:6379
+      
+  orderservice:
+    build: ./OrderService
+    container_name: orderservice
+    ports:
+      - "9001:80"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=OrderDb;Username=postgres;Password=1231
+      - ASPNETCORE_URLS=http://+:80
+      - redis=redis:6379
+
+  notificationservice:
+    build: ./NotificationService
+    container_name: notificationservice
+    ports:
+      - "5004:80"
+    depends_on:
+      - rabbitmq
+    environment:
+      - rabbitmq=rabbitmq
+    
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
 
 
   redis:
@@ -79,12 +115,12 @@ services:
     ports:
       - "27017:27017"
 
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - "3000:80"
-  #   depends_on:
-  #     - apigateway
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - apigateway
 
 volumes:
   postgres_data:    

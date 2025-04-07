@@ -132,7 +132,7 @@
         "AllowedRoles": []
       }
     },
-    //api/Cart/{userId}
+    //api/Cart/
     {
       "DownstreamPathTemplate": "/api/Cart/",
       "DownstreamScheme": "http",
