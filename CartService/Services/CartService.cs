@@ -17,14 +17,15 @@ namespace CartService.Services
         private readonly TimeSpan _cacheTimeout;
         private const string CartPrefix = "cart:";
         private readonly HttpClient _httpClient;
-        private const string productservice = "localhost:6000";
+        private readonly string _productservice;
 
-        public CartService(CartDbContext dbContext, ICacheService cacheService, HttpClient httpClient)
+        public CartService(CartDbContext dbContext, ICacheService cacheService, HttpClient httpClient, IConfiguration configuration)
         {
             _dbContext = dbContext;
             _cacheService = cacheService;
             _httpClient = httpClient;
             _cacheTimeout = TimeSpan.FromMinutes(10);
+            _productservice = configuration.GetValue<string>("productservice");
         }
 
         public async Task<CartWithProductsDto> GetCartAsync(string userId)
@@ -65,7 +66,7 @@ namespace CartService.Services
 
             if (missingProductIds.Any())
             {
-                var qwe = $"http://{productservice}/api/products?ids={string.Join(",", missingProductIds)}";
+                var qwe = $"http://{_productservice}/api/products?ids={string.Join(",", missingProductIds)}";
                 var response = await _httpClient.GetAsync(qwe);
                 var products = await response.Content.ReadFromJsonAsync<CartWithProductsDto>();
 

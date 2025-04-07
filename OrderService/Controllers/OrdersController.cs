@@ -12,9 +12,11 @@ namespace OrderService.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly RabbitMqProducer _rabbitMqProducer;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, RabbitMqProducer rabbitMqProducer)
         {
+            _rabbitMqProducer = rabbitMqProducer;
             _orderService = orderService;
         }
 
@@ -38,6 +40,7 @@ namespace OrderService.Controllers
             try
             {
                 var order = await _orderService.CreateOrderAsync(userId, orderDto);
+                _rabbitMqProducer.SendMessage(order);
                 return Ok(order);
             }
             catch (Exception ex)
