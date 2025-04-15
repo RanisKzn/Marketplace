@@ -115,6 +115,23 @@
         "AllowedRoles": [ "Admin" ]
       }
     },
+    //api/Products/upload/
+    {
+      "DownstreamPathTemplate": "/api/Products/Upload",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 6000
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/Products/Upload",
+      "UpstreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedRoles": [ "Admin" ]
+      }
+    },
     //aoi/Cart/{userId}
     {
       "DownstreamPathTemplate": "/api/Cart/{userId}",

@@ -16,6 +16,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IMongoClient>(new MongoClient(builder.Configuration.GetConnectionString("MongoDB")));
 builder.Services.AddScoped<IProductService, ProductService.Services.ProductService>();
+builder.Services.AddScoped<IYandexStorageService, YandexStorageService>();
 
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(x =>
@@ -60,6 +61,7 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 
