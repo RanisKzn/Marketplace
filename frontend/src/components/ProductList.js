@@ -19,12 +19,13 @@ const ProductList = () => {
         order: 'desc'
     });
     const [openAdd, setOpenAdd] = useState(false);
-    const [newProduct, setNewProduct] = useState({ name: '', description: '', price: '', image: '' });
+    const [newProduct, setNewProduct] = useState({ id: '', name: '', description: '', price: '', image: '' });
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const productsPerPage = 9;
     const { user } = useAuth();
+    const [imageFile, setImageFile] = useState(null);
 
     useEffect(() => {
         fetchProducts();
@@ -73,17 +74,43 @@ const ProductList = () => {
         setCurrentPage(1);
     };
 
-    const handleAddProduct = () => {
-        axios.post(`${apiUrl}/gateway/Products`, newProduct, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        })
-            .then(response => {
-                setProducts([...products, response.data]);
-                handleCloseAdd();
-            })
-            .catch(error => {
-                console.error('Ошибка при добавлении продукта:', error);
+    const handleAddProduct = async () => {
+        try {
+            let imageUrl = newProduct.image;
+
+            // Проверка на наличие файла изображения
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append('file', imageFile);
+
+                const uploadRes = await axios.post(`${apiUrl}/gateway/Products/upload`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                imageUrl = uploadRes.data.imageUrl;
+            }
+
+            // Отправка данных продукта
+            const res = await axios.post(`${apiUrl}/gateway/Products`, {
+                ...newProduct,
+                image: imageUrl,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
             });
+
+            // Обновление состояния и закрытие формы
+            setProducts([...products, res.data]);
+            handleCloseAdd();
+
+        } catch (err) {
+            console.error('Ошибка при добавлении продукта:', err);
+            // Можно добавить уведомление для пользователя об ошибке
+        }
     };
 
     const handleClickOpenAdd = () => {
@@ -98,6 +125,11 @@ const ProductList = () => {
     const handlePageChange = (event, value) => {
         setCurrentPage(value);
     };
+    const handleImageChange = (e) => {
+        setImageFile(e.target.files[0]);
+    };
+
+    
 
     return (
         <Container>
@@ -191,7 +223,7 @@ const ProductList = () => {
                     <TextField name="name" label="Название" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} fullWidth />
                     <TextField name="description" label="Описание" value={newProduct.description} onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })} fullWidth />
                     <TextField name="price" label="Цена" type="number" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} fullWidth />
-                    <TextField name="image" label="Ссылка на изображение" value={newProduct.image} onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })} fullWidth />
+                    <input type="file" accept="image/*" onChange={handleImageChange} style={{ marginTop: '1rem' }} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseAdd} color="primary">Отмена</Button>

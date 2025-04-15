@@ -91,6 +91,7 @@ namespace AuthService.Services
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Id),
                 new Claim(JwtRegisteredClaimNames.Actort, roles.FirstOrDefault()),
+                new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

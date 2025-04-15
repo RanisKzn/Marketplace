@@ -12,10 +12,12 @@ namespace ProductService.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly IYandexStorageService _yandexStorageService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, IYandexStorageService yandexStorageService)
         {
             _productService = productService;
+            _yandexStorageService = yandexStorageService;
         }
 
         [HttpGet]
@@ -51,6 +53,23 @@ namespace ProductService.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("upload")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Файл не выбран");
+
+            var imageUrl = await _yandexStorageService.UploadFileAsync(
+                file.OpenReadStream(),
+                Guid.NewGuid().ToString() + Path.GetExtension(file.FileName),
+                file.ContentType
+            );
+
+            return Ok(new { imageUrl });
+        }
+
         [HttpGet("{id:length(24)}")]
         [AllowAnonymous]
         public async Task<ActionResult<Product>> Get(string id)

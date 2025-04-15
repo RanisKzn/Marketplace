@@ -90,7 +90,7 @@ namespace CartService.Services
                     Name = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Name ?? "Неизвестный товар",
                     Description = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Description ?? "Описание",
                     Price = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Price ?? 0,
-                    Image = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Id
+                    Image = productDetails.FirstOrDefault(p => p.Id == item.ProductId)?.Image ?? "https://example.com/default-image.jpg",
                 }).ToList()
             };
 
